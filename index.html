@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kuis Fisika Seru! 🚀</title>
+    <!-- Menggunakan font Ramah Anak -->
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-bg: #e0f7fa;
+            --card-bg: #ffffff;
+            --text-color: #333333;
+            --btn-bg: #ffca28;
+            --btn-shadow: #ffb300;
+            --btn-hover: #ffecb3;
+            --correct-bg: #66bb6a;
+            --correct-shadow: #43a047;
+            --wrong-bg: #ef5350;
+            --wrong-shadow: #e53935;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Nunito', sans-serif;
+        }
+
+        body {
+            background-color: var(--primary-bg);
+            background-image: radial-gradient(rgba(0,0,0,0.05) 2px, transparent 2px);
+            background-size: 30px 30px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: var(--text-color);
+            padding: 20px;
+            transition: background-color 0.5s ease;
+        }
+
+        .quiz-container {
+            background: var(--card-bg);
+            width: 100%;
+            max-width: 450px;
+            border-radius: 24px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            padding: 30px 25px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Dekorasi Sudut */
+        .quiz-container::after {
+            content: "🌟";
+            position: absolute;
+            top: -10px;
+            right: 10px;
+            font-size: 40px;
+            opacity: 0.2;
+        }
+
+        h1 {
+            font-size: 24px;
+            color: #0277bd;
+            margin-bottom: 10px;
+            font-weight: 900;
+        }
+
+        p.subtitle {
+            font-size: 16px;
+            color: #555;
+            margin-bottom: 25px;
+        }
+
+        /* Tombol Umum */
+        .btn {
+            background-color: var(--btn-bg);
+            border: none;
+            border-radius: 16px;
+            color: #4e342e;
+            padding: 15px 20px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            width: 100%;
+            margin-bottom: 15px;
+            transition: all 0.1s ease-in-out;
+            box-shadow: 0 6px 0 var(--btn-shadow);
+        }
+
+        .btn:hover {
+            background-color: var(--btn-hover);
+            transform: translateY(2px);
+            box-shadow: 0 4px 0 var(--btn-shadow);
+        }
+
+        .btn:active {
+            transform: translateY(6px);
+            box-shadow: 0 0px 0 var(--btn-shadow);
+        }
+
+        /* Tombol Alternatif (Halaman Awal) */
+        .btn-alt {
+            background-color: #b3e5fc;
+            color: #0277bd;
+            box-shadow: 0 6px 0 #4fc3f7;
+        }
+        
+        .btn-alt:hover {
+            background-color: #e1f5fe;
+            box-shadow: 0 4px 0 #4fc3f7;
+        }
+
+        .btn-alt:active {
+            box-shadow: 0 0px 0 #4fc3f7;
+        }
+
+        .btn:disabled {
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        /* Area Pertanyaan */
+        #question-container {
+            margin-top: 20px;
+        }
+
+        .question-text {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            line-height: 1.4;
+        }
+
+        /* Status Benar/Salah */
+        .btn.correct {
+            background-color: var(--correct-bg);
+            color: white;
+            box-shadow: 0 6px 0 var(--correct-shadow);
+        }
+        
+        .btn.wrong {
+            background-color: var(--wrong-bg);
+            color: white;
+            box-shadow: 0 6px 0 var(--wrong-shadow);
+        }
+
+        /* Feedback Indikator */
+        #feedback {
+            font-size: 22px;
+            font-weight: 900;
+            min-height: 30px;
+            margin-top: 15px;
+            transition: opacity 0.3s;
+        }
+
+        .feedback-correct { color: #43a047; }
+        .feedback-wrong { color: #e53935; }
+
+        /* Layar Skor */
+        .score-display {
+            font-size: 48px;
+            font-weight: 900;
+            color: #ff9800;
+            margin: 20px 0;
+            text-shadow: 2px 2px 0px #ffe082;
+        }
+
+        .mascot {
+            font-size: 60px;
+            margin-bottom: 10px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            width: 100%;
+            background-color: #eee;
+            border-radius: 10px;
+            height: 10px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background-color: #0288d1;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="quiz-container">
+        
+        <!-- Layar Mulai -->
+        <div id="start-screen">
+            <div class="mascot">🚀🔭</div>
+            <h1>Kuis Pengukuran Fisika!</h1>
+            <p class="subtitle">Yuk, uji pengetahuanmu tentang alat ukur dan besaran fisika!</p>
+            <input type="text" id="student-name" placeholder="Siapa namamu?" style="width: 100%; padding: 15px; border-radius: 16px; border: 2px solid #ccc; font-size: 16px; margin-bottom: 20px; font-weight: bold; text-align: center;" required>
+            <button class="btn" onclick="startQuiz()">Mulai Bermain! ▶️</button>
+        </div>
+
+        <!-- Layar Pertanyaan -->
+        <div id="quiz-screen" class="hidden">
+            <div class="progress-container">
+                <div id="progress-bar" class="progress-bar"></div>
+            </div>
+            <p id="question-count" style="color: #888; margin-bottom: 10px; font-weight: bold;"></p>
+            <div id="question-container">
+                <img id="question-image" src="" alt="Ilustrasi Soal" style="width: 100%; max-height: 200px; object-fit: contain; border-radius: 16px; margin-bottom: 15px; display: none; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+                <p id="question-text" class="question-text">Pertanyaan akan muncul di sini</p>
+                <div id="answer-buttons">
+                    <!-- Tombol jawaban akan di-generate oleh JS -->
+                </div>
+            </div>
+            <div id="feedback"></div>
+        </div>
+
+        <!-- Layar Hasil -->
+        <div id="result-screen" class="hidden">
+            <div id="result-mascot" class="mascot">🎉</div>
+            <h1 id="result-title">Kuis Selesai!</h1>
+            <p class="subtitle">Total Poin Kamu:</p>
+            <div id="score" class="score-display">0</div>
+            
+            <!-- Box Peringkat -->
+            <div id="grade-container" style="background: #fff; border: 3px solid #ffca28; border-radius: 16px; padding: 15px; margin-bottom: 20px;">
+                <p style="font-size: 16px; color: #555; font-weight: bold; margin-bottom: 5px;">Peringkat / Nilai:</p>
+                <div id="grade-display" style="font-size: 28px; font-weight: 900;">A (Sangat Baik)</div>
+            </div>
+
+            <p id="result-message" style="margin-bottom: 20px; font-weight: 700; font-size: 18px;"></p>
+            <button class="btn" onclick="restartQuiz()">Ulangi Kuis (Nama Sama) 🔄</button>
+            <button class="btn btn-alt" onclick="goToStartScreen()">Ganti Pemain (Awal) 👤</button>
+        </div>
+
+    </div>
+
+    <script>
+        // Data Soal
+        const questions = [
+            // MUDAH
+            {
+                question: "(Level: Mudah) Alat ukur yang tepat untuk mengukur panjang sebuah pensil adalah... ✏️",
+                image: "pencil.png",
+                answers: [
+                    { text: "Timbangan", correct: false },
+                    { text: "Termometer", correct: false },
+                    { text: "Penggaris", correct: true },
+                    { text: "Jam Tangan", correct: false }
+                ]
+            },
+            {
+                question: "(Level: Mudah) Benda di bawah ini yang digunakan untuk mengukur 'Massa' atau berat suatu benda adalah... 🍎",
+                image: "apple.png",
+                answers: [
+                    { text: "Timbangan / Neraca", correct: true },
+                    { text: "Meteran", correct: false },
+                    { text: "Gelas Ukur", correct: false },
+                    { text: "Stopwatch", correct: false }
+                ]
+            },
+            {
+                question: "(Level: Mudah) Jika kamu ingin menghitung durasi waktu saat berlari, kamu menggunakan satuan... 🏃‍♂️",
+                image: "stopwatch.png",
+                answers: [
+                    { text: "Meter", correct: false },
+                    { text: "Detik", correct: true },
+                    { text: "Kilogram", correct: false },
+                    { text: "Celcius", correct: false }
+                ]
+            },
+            // SEDANG
+            {
+                question: "(Level: Sedang) Suhu tubuh adik saat demam biasanya diukur menggunakan alat yang bernama... 🤒",
+                image: "thermometer.png",
+                answers: [
+                    { text: "Barometer", correct: false },
+                    { text: "Dinamometer", correct: false },
+                    { text: "Termometer", correct: true },
+                    { text: "Speedometer", correct: false }
+                ]
+            },
+            {
+                question: "(Level: Sedang) Satuan baku yang paling tepat untuk mengukur jarak dari kotamu ke kota lain adalah... 🛣️",
+                image: "highway_distance.png",
+                answers: [
+                    { text: "Centimeter", correct: false },
+                    { text: "Kilogram", correct: false },
+                    { text: "Kilometer", correct: true },
+                    { text: "Liter", correct: false }
+                ]
+            },
+            {
+                question: "(Level: Sedang) 1 kilogram itu sama dengan berapa gram? ⚖️",
+                image: "kilogram_weights.png",
+                answers: [
+                    { text: "10 gram", correct: false },
+                    { text: "100 gram", correct: false },
+                    { text: "1.000 gram", correct: true },
+                    { text: "10.000 gram", correct: false }
+                ]
+            },
+            {
+                question: "(Level: Sedang) Untuk mengukur volume air minum yang ada di dalam botol besar, kita biasa menggunakan satuan... 💧",
+                answers: [
+                    { text: "Meter", correct: false },
+                    { text: "Liter", correct: true },
+                    { text: "Gram", correct: false },
+                    { text: "Detik", correct: false }
+                ]
+            },
+            // SULIT
+            {
+                question: "(Level: Sulit) Jika panjang sebuah penghapus adalah 5 centimeter, maka dalam milimeter panjangnya adalah... 📏",
+                answers: [
+                    { text: "50 milimeter", correct: true },
+                    { text: "500 milimeter", correct: false },
+                    { text: "0,5 milimeter", correct: false },
+                    { text: "5.000 milimeter", correct: false }
+                ]
+            },
+            {
+                question: "(Level: Sulit) Alat ukur manakah yang sangat teliti dan sering digunakan untuk mengukur ketebalan sebuah uang logam? 🪙",
+                answers: [
+                    { text: "Penggaris Kayu", correct: false },
+                    { text: "Meteran Pita", correct: false },
+                    { text: "Jangka Sorong", correct: true },
+                    { text: "Timbangan Digital", correct: false }
+                ]
+            },
+            {
+                question: "(Level: Sulit) Es batu yang mencair biasanya terjadi pada suhu sekitar... 🧊",
+                answers: [
+                    { text: "100 derajat Celcius", correct: false },
+                    { text: "50 derajat Celcius", correct: false },
+                    { text: "0 derajat Celcius", correct: true },
+                    { text: "10 derajat Celcius", correct: false }
+                ]
+            }
+        ];
+
+        // Variabel Status
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let canClick = true;
+        let studentName = "";
+
+        // Daftar Warna Background
+        const bgColors = [
+            '#e0f7fa', '#fce4ec', '#e8f5e9', '#fff3e0', '#ede7f6',
+            '#e3f2fd', '#f1f8e9', '#fbe9e7', '#e0f2f1', '#fff8e1'
+        ];
+
+        // Elemen DOM
+        const startScreen = document.getElementById('start-screen');
+        const quizScreen = document.getElementById('quiz-screen');
+        const resultScreen = document.getElementById('result-screen');
+        
+        const questionTextElement = document.getElementById('question-text');
+        const questionImageElement = document.getElementById('question-image');
+        const answerButtonsElement = document.getElementById('answer-buttons');
+        const questionCountElement = document.getElementById('question-count');
+        const feedbackElement = document.getElementById('feedback');
+        const progressBarElement = document.getElementById('progress-bar');
+        
+        const scoreElement = document.getElementById('score');
+        const resultMessageElement = document.getElementById('result-message');
+        const resultMascotElement = document.getElementById('result-mascot');
+
+        function startQuiz() {
+            const nameInput = document.getElementById('student-name').value.trim();
+            if(!nameInput) {
+                alert("Halo! Siapa namamu? Isi namamu dulu ya sebelum mulai 😊");
+                document.getElementById('student-name').focus();
+                return;
+            }
+            studentName = nameInput;
+
+            startScreen.classList.add('hidden');
+            resultScreen.classList.add('hidden');
+            quizScreen.classList.remove('hidden');
+            
+            currentQuestionIndex = 0;
+            score = 0;
+            showQuestion();
+        }
+
+        function showQuestion() {
+            canClick = true;
+            feedbackElement.innerText = "";
+            feedbackElement.className = "";
+            resetState();
+
+            // Update Progress dan Background Warna
+            const progressPercentage = ((currentQuestionIndex) / questions.length) * 100;
+            progressBarElement.style.width = progressPercentage + "%";
+            
+            document.documentElement.style.setProperty('--primary-bg', bgColors[currentQuestionIndex % bgColors.length]);
+            
+            let currentQuestion = questions[currentQuestionIndex];
+            questionCountElement.innerText = `Soal ${currentQuestionIndex + 1} dari ${questions.length}`;
+            questionTextElement.innerText = currentQuestion.question;
+
+            if (currentQuestion.image) {
+                questionImageElement.src = currentQuestion.image;
+                questionImageElement.style.display = "block";
+            } else {
+                questionImageElement.style.display = "none";
+            }
+
+            currentQuestion.answers.forEach(answer => {
+                const button = document.createElement('button');
+                button.innerText = answer.text;
+                button.classList.add('btn');
+                if (answer.correct) {
+                    button.dataset.correct = answer.correct;
+                }
+                button.addEventListener('click', selectAnswer);
+                answerButtonsElement.appendChild(button);
+            });
+        }
+
+        function resetState() {
+            while (answerButtonsElement.firstChild) {
+                answerButtonsElement.removeChild(answerButtonsElement.firstChild);
+            }
+        }
+
+        function selectAnswer(e) {
+            if (!canClick) return; // Mencegah klik berulang kali saat animasi
+            canClick = false;
+
+            const selectedBtn = e.target;
+            const isCorrect = selectedBtn.dataset.correct === "true";
+
+            if (isCorrect) {
+                selectedBtn.classList.add("correct");
+                score += 100; // Skor 100 per soal
+                feedbackElement.innerText = "Yey! Jawabanmu Benar! 🌟";
+                feedbackElement.className = "feedback-correct";
+            } else {
+                selectedBtn.classList.add("wrong");
+                feedbackElement.innerText = "Ups! Jawaban kurang tepat 😅";
+                feedbackElement.className = "feedback-wrong";
+            }
+
+            // Tampilkan jawaban yang benar juga jika siswa salah jawab
+            Array.from(answerButtonsElement.children).forEach(button => {
+                if (button.dataset.correct === "true") {
+                    button.classList.add("correct");
+                }
+                button.disabled = true; // Disable semua tombol
+            });
+
+            // Lanjut ke soal berikutnya setelah 2 detik
+            setTimeout(() => {
+                currentQuestionIndex++;
+                if (currentQuestionIndex < questions.length) {
+                    showQuestion();
+                } else {
+                    showResult();
+                }
+            }, 2000);
+        }
+
+        function showResult() {
+            quizScreen.classList.add('hidden');
+            resultScreen.classList.remove('hidden');
+
+            document.getElementById('result-title').innerText = `Kuis Selesai, ${studentName}!`;
+            
+            // Hitung total nilai sempurna = jumlah soal * 100
+            const maxScore = questions.length * 100;
+            scoreElement.innerText = score;
+
+            const gradeDisplay = document.getElementById('grade-display');
+
+            // Logika Peringkat (Penilaian) untuk 10 SOAL (Maks 1000)
+            if (score >= 900) {
+                gradeDisplay.innerText = "A (Sangat Baik) 🥇";
+                gradeDisplay.style.color = "#43a047";
+                resultMascotElement.innerText = "🏆";
+                resultMessageElement.innerText = `Luar Biasa ${studentName}! Kamu ilmuwan cilik yang jenius!`;
+                resultMessageElement.style.color = "#43a047";
+            } else if (score >= 700) {
+                gradeDisplay.innerText = "B (Baik) 🥈";
+                gradeDisplay.style.color = "#1e88e5";
+                resultMascotElement.innerText = "👍";
+                resultMessageElement.innerText = `Hebat ${studentName}! Pertahankan prestasimu ya!`;
+                resultMessageElement.style.color = "#1e88e5";
+            } else if (score >= 500) {
+                gradeDisplay.innerText = "C (Cukup) 🥉";
+                gradeDisplay.style.color = "#fb8c00";
+                resultMascotElement.innerText = "📚";
+                resultMessageElement.innerText = `Bagus ${studentName}! Terus semangat belajarnya ya!`;
+                resultMessageElement.style.color = "#fb8c00";
+            } else {
+                gradeDisplay.innerText = "D (Kurang) 💡";
+                gradeDisplay.style.color = "#e53935";
+                resultMascotElement.innerText = "💪";
+                resultMessageElement.innerText = `Jangan menyerah ${studentName}! Ayo coba lagi, kamu pasti bisa!`;
+                resultMessageElement.style.color = "#e53935";
+            }
+        }
+
+        function restartQuiz() {
+            startQuiz();
+        }
+
+        function goToStartScreen() {
+            // Reset nama
+            document.getElementById('student-name').value = '';
+            studentName = '';
+            
+            // Kembalikan ke background utama
+            document.documentElement.style.setProperty('--primary-bg', '#e0f7fa');
+            
+            quizScreen.classList.add('hidden');
+            resultScreen.classList.add('hidden');
+            startScreen.classList.remove('hidden');
+            
+            document.getElementById('student-name').focus();
+        }
+    </script>
+</body>
+</html>
